@@ -3,7 +3,7 @@
 };
 
 var config = { 
-	appId: "3MVG9SemV5D80oBfwImbjmCUOou.4aPypic3uXz3JXxQq1EKb23HFxjXYt96T9WlOAu.gYwjUCWUvFXj_h4_d", 
+	appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2", 
 	loApp: "c:HouseExplorerLOApp" 
 }; 
 
