@@ -31,7 +31,7 @@ function setupLightning(callback) {
 	    $Lightning.use(appName, 
 	        function() {
 				_lightningReady = true;
-				document.getElementById(targetElementId).style.display = "";
+				document.getElementById(config.targetElementId).style.display = "";
 				if (typeof callback === "function") {
 					callback();
 				}
