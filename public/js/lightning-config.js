@@ -24,10 +24,11 @@ function setupLightning(callback) {
 	} else {
 	    // Transform the URL for Lightning
 		var url = document.createElement('a');
+		url.href = oauth.instanceUrl;
 		var host = url.hostname;
 		var mydomain = host.split(".")[0];
 	    url = url.protocol + "//" + mydomain +  ".lightning.force.com"; // oauth.instanceUrl.replace("my.salesforce", "lightning.force");
-		console.log("Instance url: " + oauth.instanceUrl);
+		console.log("Instance url: " + url);
 	    $Lightning.use(appName, 
 	        function() {
 				_lightningReady = true;
