@@ -1,5 +1,4 @@
-﻿/* global $Lightning */
-$Lightning = {
+﻿$Lightning = {
 	use : function(applicationTag, callback, lightningEndPointURI, authToken) {
 		if (this._applicationTag && this._applicationTag !== applicationTag) {
 			throw new Error("$Lightning.use() already invoked with application: " + this._applicationTag);
