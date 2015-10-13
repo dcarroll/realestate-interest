@@ -4,7 +4,8 @@
 
 var config = { 
 	appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2", 
-	loApp: "c:HouseExplorerLOApp" 
+	loApp: "c:HouseExplorerLOApp",
+	targetElementId: "lightning"
 }; 
 
 var _lightningReady = false;
@@ -23,15 +24,14 @@ function setupLightning(callback) {
 		}
 	} else {
 	    // Transform the URL for Lightning
-		var url = document.createElement('a');
-		url.href = oauth.instanceUrl;
-		var mydomain = url.hostname.split(".")[0];
-		//var mydomain = host.split(".")[0];
-	    url = url.protocol + "//" + mydomain +  ".lightning.force.com"; // oauth.instanceUrl.replace("my.salesforce", "lightning.force");
+		var anchor = document.createElement('a');
+		anchor.href = oauth.instanceUrl;
+		var mydomain = anchor.hostname.split(".")[0];
+	    var url = anchor.protocol + "//" + mydomain +  ".lightning.force.com"; 
 	    $Lightning.use(appName, 
 	        function() {
 				_lightningReady = true;
-				document.getElementById("lightning").style.display = "";
+				document.getElementById(targetElementId).style.display = "";
 				if (typeof callback === "function") {
 					callback();
 				}
