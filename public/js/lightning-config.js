@@ -23,7 +23,10 @@ function setupLightning(callback) {
 		}
 	} else {
 	    // Transform the URL for Lightning
-	    var url = "https://d10-dev-ed.lightning.force.com"; // oauth.instanceUrl.replace("my.salesforce", "lightning.force");
+		var url = document.createElement('a');
+		var host = url.hostname;
+		var mydomain = host.split(".")[0];
+	    url = url.protocol + "//" + mydomain +  ".lightning.force.com"; // oauth.instanceUrl.replace("my.salesforce", "lightning.force");
 		console.log("Instance url: " + oauth.instanceUrl);
 	    $Lightning.use(appName, 
 	        function() {
