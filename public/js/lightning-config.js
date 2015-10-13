@@ -2,6 +2,7 @@
 	force.init(config);
 };
 
+// Config vars
 var config = { 
 	appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2", 
 	loApp: "c:HouseExplorerLOApp",
