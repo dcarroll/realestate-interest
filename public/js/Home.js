@@ -1,4 +1,5 @@
-﻿/// <reference path="../App.js" />
+﻿/* global $ */
+/// <reference path="App.js" />
 // global app
 
 (function () {

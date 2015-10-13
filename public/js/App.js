@@ -1,4 +1,5 @@
-﻿// Common app functionality
+﻿/* global Office */
+// Common app functionality
 
 var app = (function () {
     'use strict';
@@ -50,7 +51,7 @@ var app = (function () {
 	app.forceLogin = function(key) {
 		forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 		force.login(function(success) {
-			var oauth = force.getOauth();
+			force.getOauth();
 			setupLightning(app.createComponent);
 		});	
 	};

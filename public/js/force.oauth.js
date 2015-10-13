@@ -4,6 +4,7 @@
  *
  * Cut-down version with a few changes to expose the oauth bits, and to remove the REST call support
  */
+/* global force */
 var force = (function () {
 
     // The login url
