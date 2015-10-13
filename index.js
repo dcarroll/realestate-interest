@@ -18,7 +18,7 @@ app.get('/AppRead/Home/', function(request, response) {
 });
 
 app.get('/AppRead/oauthcallback/', function(request, response) {
-  response.render('pages/AppRead/oauthcallback');
+  response.render('pages/oauthcallback');
 });
 
 app.listen(app.get('port'), function() {
