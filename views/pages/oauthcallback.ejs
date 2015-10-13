@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<script>
+	    console.warn("oauthcallback.html");
+        debugger;
+		window.beforeunload = function() {
+			alert(window.location.href);
+		}
+        try {
+		    if (window.opener.force && window.opener.force.oauthCallback) {
+			    window.opener.force.oauthCallback(window.location.href);
+		    } else if (window.opener.oauthCallback) {
+			    window.opener.oauthCallback(window.location.href);
+		    }
+        } catch (e) {
+            alert("Authentication incomplete...");
+        }
+		window.close();
+	</script>
+</head>
+<body></body>
+</html>
+

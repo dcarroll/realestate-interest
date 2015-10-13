@@ -17,6 +17,10 @@ app.get('/AppRead/Home/', function(request, response) {
   response.render('pages/AppRead/Home/home');
 });
 
+app.get('/oauthcallback/', function(request, response) {
+  response.render('pages/oauthcallback');
+});
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
