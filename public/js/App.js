@@ -18,7 +18,7 @@ export let clearLogin = () => {
 // Common initialization function (to be called from each page)
 export let initialize = () => {
 	console.log("app.initialize 2");
-	app.forceLogin();
+	forceLogin();
 };
 
 export let getMessageData = () => {
@@ -26,7 +26,7 @@ export let getMessageData = () => {
 };
 
 export let getSenderData = () => {
-	var item = app.getMessageData();
+	var item = getMessageData();
 	var from;
 	if (item.itemType === Office.MailboxEnums.ItemType.Message) {
 		from = Office.cast.item.toMessageRead(item).from;
@@ -37,7 +37,7 @@ export let getSenderData = () => {
 };
 
 export let createComponent = () => {
-	var from = app.getSenderData();
+	var from = getSenderData();
 	$Lightning.createComponent("c:HouseTab", 
 		{ contactName: from.emailAddress  }, "lightning",
 		function(cmp) {

@@ -564,7 +564,7 @@ exports.clearLogin = clearLogin;
 // Common initialization function (to be called from each page)
 var initialize = function initialize() {
 	console.log("app.initialize 2");
-	app.forceLogin();
+	forceLogin();
 };
 
 exports.initialize = initialize;
@@ -574,7 +574,7 @@ var getMessageData = function getMessageData() {
 
 exports.getMessageData = getMessageData;
 var getSenderData = function getSenderData() {
-	var item = app.getMessageData();
+	var item = getMessageData();
 	var from;
 	if (item.itemType === Office.MailboxEnums.ItemType.Message) {
 		from = Office.cast.item.toMessageRead(item).from;
@@ -586,7 +586,7 @@ var getSenderData = function getSenderData() {
 
 exports.getSenderData = getSenderData;
 var createComponent = function createComponent() {
-	var from = app.getSenderData();
+	var from = getSenderData();
 	$Lightning.createComponent("c:HouseTab", { contactName: from.emailAddress }, "lightning", function (cmp) {
 		// Here we have access to the lightning component we are using
 		console.log("Component created");
