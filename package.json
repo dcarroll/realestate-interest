@@ -1,26 +1,32 @@
 {
-  "name": "node-js-getting-started",
-  "version": "0.1.5",
-  "description": "A sample Node.js app using Express 4",
+  "name": "realestate-interest",
+  "version": "0.1.0",
+  "description": "A sample app for Lightning Out in O365",
   "main": "index.js",
   "scripts": {
+    "compile": "browserify public/js/App.js -t babelify -o bundle.js",
     "start": "node index.js"
   },
+  "author": "Dave Carroll",
   "dependencies": {
     "ejs": "2.3.3",
-    "express": "4.13.3"
-  },
+    "express": "4.13.3",
+    "babel": "^5.8.29",
+    "babelify": "^6.4.0",
+    "browserify": "^12.0.0",
+    "forcejs": "^0.7.2"
+ },
   "engines": {
     "node": "0.12.7"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://github.com/dcarroll/realestate-interest"
   },
   "keywords": [
     "node",
     "heroku",
     "express"
   ],
-  "license": "MIT"
+  "license": "ISC"
 }
