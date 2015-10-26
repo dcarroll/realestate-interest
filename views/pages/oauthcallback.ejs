@@ -2,7 +2,7 @@
 <html>
 <head>
 	<script>
-	    console.warn("oauthcallback.html");
+	    /*console.warn("oauthcallback.html");
         debugger;
 		window.beforeunload = function() {
 			alert(window.location.href);
@@ -16,7 +16,10 @@
         } catch (e) {
             alert("Authentication incomplete...");
         }
-		window.close();
+		window.close();*/
+		var event = new CustomEvent("oauthCallback", {'detail': window.location.href});
+    	window.opener.document.dispatchEvent(event);
+    	window.close();
 	</script>
 </head>
 <body></body>
