@@ -603,7 +603,9 @@ var createComponent = function createComponent() {
 
 exports.createComponent = createComponent;
 var forceLogin = function forceLogin(key) {
-	forcejs.init({ appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2" });
+	forcejs.init({
+		appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2",
+		oauthCallbackURL: baseURL + "/callback" });
 	forcejs.login();
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
