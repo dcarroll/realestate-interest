@@ -49,6 +49,7 @@ var app = (function () {
 	};
 
 	app.forceLogin = function (key) {
+		forcejs.login();
 		forceInit({ instanceUrl: "https://d10-dev-ed.salesforce.com" });
 		force.login(function (success) {
 			force.getOauth();

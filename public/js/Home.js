@@ -1,6 +1,7 @@
 ﻿/* global $ */
 /// <reference path="App.js" />
 // global app
+import * as forcejs from 'forcejs';
 
 (function () {
     'use strict';
@@ -18,6 +19,6 @@
 	};
 	
     function addActivity() {
-        
+
     }
 })();
