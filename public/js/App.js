@@ -1,5 +1,6 @@
 ﻿/* global Office */
 // Common app functionality
+import * as forcejs from 'forcejs';
 
 'use strict';
 

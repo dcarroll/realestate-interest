@@ -541,12 +541,20 @@ exports.chatter = chatter;
 },{}],2:[function(require,module,exports){
 /* global Office */
 // Common app functionality
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+var _forcejs = require('forcejs');
+
+var forcejs = _interopRequireWildcard(_forcejs);
 
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
 var app = {};
 
 var saveSetting = function saveSetting(name, value) {
@@ -604,7 +612,7 @@ var forceLogin = function forceLogin(key) {
 };
 exports.forceLogin = forceLogin;
 
-},{}],3:[function(require,module,exports){
+},{"forcejs":1}],3:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
