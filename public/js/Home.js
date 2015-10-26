@@ -2,6 +2,7 @@
 /// <reference path="App.js" />
 // global app
 import * as forcejs from 'forcejs';
+import * as app from './App';
 
 (function () {
     'use strict';
