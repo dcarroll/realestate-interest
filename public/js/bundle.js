@@ -31,7 +31,6 @@ var clearLogin = function clearLogin() {
 	_settings.saveAsync();
 };
 
-exports.clearLogin = clearLogin;
 // Common initialization function (to be called from each page)
 var initialize = function initialize(settings) {
 	console.log("app.initialize 2");

@@ -13,7 +13,7 @@ export let saveSetting = (name, value) => {
 	_settings.saveAsync();
 };
 
-export let clearLogin = () => {
+var clearLogin = () => {
 	_settings.remove("oauth");
 	_settings.saveAsync();
 };
