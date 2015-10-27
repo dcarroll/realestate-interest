@@ -51,7 +51,7 @@ export let getSenderData = () => {
 
 export let createComponent = () => {
 	var from = getSenderData();
-	$Lightning.createComponent("c:HouseTab", 
+	lightning.createComponent("c:HouseTab", 
 		{ contactName: from.emailAddress  }, "lightning",
 		function(cmp) {
 			// Here we have access to the lightning component we are using

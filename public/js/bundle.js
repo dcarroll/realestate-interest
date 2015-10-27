@@ -73,7 +73,7 @@ var getSenderData = function getSenderData() {
 exports.getSenderData = getSenderData;
 var createComponent = function createComponent() {
 	var from = getSenderData();
-	$Lightning.createComponent("c:HouseTab", { contactName: from.emailAddress }, "lightning", function (cmp) {
+	lightning.createComponent("c:HouseTab", { contactName: from.emailAddress }, "lightning", function (cmp) {
 		// Here we have access to the lightning component we are using
 		console.log("Component created");
 	});
@@ -897,4 +897,4 @@ var lightningLoaded = function lightningLoaded() {
 };
 exports.lightningLoaded = lightningLoaded;
 
-},{}]},{},[5,1,3,2]);
+},{}]},{},[5,4,1,3,2]);
