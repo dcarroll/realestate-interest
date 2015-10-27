@@ -765,7 +765,7 @@ var clearLogin = function clearLogin() {
 exports.clearLogin = clearLogin;
 // Common initialization function (to be called from each page)
 var initialize = function initialize(settings) {
-	lightning.init({ "loApp": "c:HouseExplorerLOApp" });
+	lightning.init({ "targetElementId": "lightning" });
 	exports._settings = _settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
 		//localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
