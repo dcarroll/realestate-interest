@@ -56,10 +56,10 @@ export let forceLogin = key => {
 			tokenStore:oauth
 		}
 	);
-	forcejs.login();
+	forcejs.login().saveSetting("oauth", oauth);
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
-		saveSetting("oauth", oauth);
+		//saveSetting("oauth", oauth);
 
 		setupLightning(app.createComponent);
 	//});	
