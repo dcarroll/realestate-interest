@@ -632,10 +632,6 @@ exports.forceLogin = forceLogin;
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _forcejs = require('forcejs');
-
-var forcejs = _interopRequireWildcard(_forcejs);
-
 var _App = require('./App');
 
 var app = _interopRequireWildcard(_App);
@@ -656,4 +652,4 @@ function clearLogin() {
 
 function addActivity() {};
 
-},{"./App":2,"forcejs":1}]},{},[2,3]);
+},{"./App":2}]},{},[2,3]);
