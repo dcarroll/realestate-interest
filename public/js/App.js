@@ -27,7 +27,7 @@ export let initialize = (settings) => {
 	_settings = settings;
 	if (_settings.get("oauth") != undefined) {
 		oauth = _settings.get("oauth");
-		lightningConfig.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	} else {
 		forceLogin();
 	}
