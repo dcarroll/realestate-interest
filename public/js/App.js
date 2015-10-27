@@ -22,7 +22,7 @@ export let clearLogin = () => {
 
 // Common initialization function (to be called from each page)
 export let initialize = (settings) => {
-	lightning.init();
+	lightning.init({"loApp":"c:HouseExplorerLOApp"});
 	_settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
 		//localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
