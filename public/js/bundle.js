@@ -13,9 +13,13 @@ var _force = require('./force');
 
 var forcejs = _interopRequireWildcard(_force);
 
+var _lightningConfig = require('./lightning-config');
+
+var lightningConfig = _interopRequireWildcard(_lightningConfig);
+
 var _lightningOutEs6 = require('./lightning-out-es6');
 
-var lightningOout = _interopRequireWildcard(_lightningOutEs6);
+var lightning = _interopRequireWildcard(_lightningOutEs6);
 
 'use strict';
 
@@ -43,7 +47,7 @@ var initialize = function initialize(settings) {
 	exports._settings = _settings = settings;
 	if (_settings.get("oauth") != undefined) {
 		oauth = _settings.get("oauth");
-		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightningConfig.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	} else {
 		forceLogin();
 	}
@@ -85,7 +89,7 @@ var forceLogin = function forceLogin(key) {
 		return forcejs.login();
 	}).then(function () {
 		saveSetting("oauth", oauth);
-		lightningOut.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
@@ -98,7 +102,7 @@ var forceLogin = function forceLogin(key) {
 exports.forceLogin = forceLogin;
 clearLoginLink.addEventListener("click", clearLogin);
 
-},{"./force":3,"./lightning-out-es6":4}],2:[function(require,module,exports){
+},{"./force":3,"./lightning-config":4,"./lightning-out-es6":5}],2:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
@@ -671,6 +675,56 @@ var chatter = function chatter(pathOrParams) {
 exports.chatter = chatter;
 
 },{}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+
+var _lightningOutEs6 = require('./lightning-out-es6');
+
+var lightningOut = _interopRequireWildcard(_lightningOutEs6);
+
+// Config vars area
+var config = {
+	appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2",
+	loApp: "c:HouseExplorerLOApp",
+	targetElementId: "lightning"
+};
+
+var _lightningReady = false;
+
+var setupLightning = function setupLightning(callback, oauth) {
+	var appName = config.loApp;
+	if (!oauth) {
+		alert("Please login to Salesforce.com first!");
+		return;
+	}
+
+	if (_lightningReady) {
+		if (typeof callback === "function") {
+			callback();
+		}
+	} else {
+		// Transform the URL for Lightning
+		var anchor = document.createElement('a');
+		anchor.href = oauth.instance_url;
+		var mydomain = anchor.hostname.split(".")[0];
+		var url = anchor.protocol + "//" + mydomain + ".lightning.force.com";
+		lightningOut.use(appName, function () {
+			_lightningReady = true;
+			document.getElementById(config.targetElementId).style.display = "";
+			if (typeof callback === "function") {
+				callback();
+			}
+		}, url, oauth.access_token);
+	}
+};
+exports.setupLightning = setupLightning;
+
+},{"./lightning-out-es6":5}],5:[function(require,module,exports){
 /* global $Lightning */
 "use strict";
 
@@ -702,15 +756,14 @@ var use = function use(applicationTag, callback, lightningEndPointURI, authToken
 				var config = JSON.parse(xhr.responseText);
 				var auraInitConfig = config.auraInitConfig;
 
-				$Lightning.addScripts(config.scripts, function () {
+				addScripts(config.scripts, function () {
 					$A.initConfig(auraInitConfig, true);
-
-					$Lightning.lightningLoaded();
+					lightningLoaded();
 				});
 
 				var styles = config.styles;
 				for (var n = 0; n < styles.length; n++) {
-					$Lightning.addStyle(styles[n]);
+					addStyle(styles[n]);
 				}
 			}
 		};
@@ -844,4 +897,4 @@ var lightningLoaded = function lightningLoaded() {
 };
 exports.lightningLoaded = lightningLoaded;
 
-},{}]},{},[4,1,3,2]);
+},{}]},{},[5,1,3,2]);

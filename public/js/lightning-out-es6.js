@@ -24,15 +24,14 @@ export let use = (applicationTag, callback, lightningEndPointURI, authToken) => 
 				var config = JSON.parse(xhr.responseText);
 				var auraInitConfig = config.auraInitConfig;
 				
-				$Lightning.addScripts(config.scripts, function() {
-					$A.initConfig(auraInitConfig, true);
-					
-					$Lightning.lightningLoaded();
+				addScripts(config.scripts, function() {
+					$A.initConfig(auraInitConfig, true);					
+					lightningLoaded();
 				});
 				
 				var styles = config.styles;
 				for (var n = 0; n < styles.length; n++) {
-					$Lightning.addStyle(styles[n]);
+					addStyle(styles[n]);
 				}
 			}
 		};

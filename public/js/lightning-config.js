@@ -1,14 +1,15 @@
-﻿
+﻿import * as lightningOut from './lightning-out-es6';
+
 // Config vars area
-var config = { 
+let config = { 
 	appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2", 
 	loApp: "c:HouseExplorerLOApp",
 	targetElementId: "lightning"
 }; 
 
-var _lightningReady = false;
+let _lightningReady = false;
 
-function setupLightning(callback, oauth) {
+export let setupLightning = (callback, oauth) => {
 	var appName = config.loApp;
     if (!oauth) {
         alert("Please login to Salesforce.com first!");
@@ -25,7 +26,7 @@ function setupLightning(callback, oauth) {
 		anchor.href = oauth.instance_url;
 		var mydomain = anchor.hostname.split(".")[0];
 	    var url = anchor.protocol + "//" + mydomain +  ".lightning.force.com"; 
-	    $Lightning.use(appName, 
+	    lightningOut.use(appName, 
 	        function() {
 				_lightningReady = true;
 				document.getElementById(config.targetElementId).style.display = "";

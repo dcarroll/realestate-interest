@@ -1,7 +1,8 @@
 ﻿/* global Office */
 // Common app functionality
 import * as forcejs from './force';
-import * as lightningOout from './lightning-out-es6';
+import * as lightningConfig from './lightning-config';
+import * as lightning from './lightning-out-es6';
 
 'use strict';
 
@@ -27,7 +28,7 @@ export let initialize = (settings) => {
 	_settings = settings;
 	if (_settings.get("oauth") != undefined) {
 		oauth = _settings.get("oauth");
-		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightningConfig.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	} else {
 		forceLogin();
 	}
@@ -68,7 +69,7 @@ export let forceLogin = key => {
 	).then(() => forcejs.login())
 	.then(() => {
 		saveSetting("oauth", oauth);
-		lightningOut.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
