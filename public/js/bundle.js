@@ -220,7 +220,7 @@ var initialize = function initialize(settings) {
 	console.log("app.initialize 2");
 	exports._settings = _settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
-		localStorage.set("forceOAuth", _settings.get("forceOAuth"));
+		localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
 		lightning.setupLightning(createComponent, JSON.parse(_settings.get("forceOAuth")));
 	} else {
 		forceLogin();
@@ -262,7 +262,7 @@ var forceLogin = function forceLogin(key) {
 	});
 	forcejs.login().then(function () {
 		//saveSetting("oauth", oauth);
-		lightning.setupLightning(createComponent, JSON.parse(localStorage.get("forceOAuth")));
+		lightning.setupLightning(createComponent, JSON.parse(localStorage.getItem("forceOAuth")));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
@@ -477,19 +477,11 @@ var joinPaths = function joinPaths(path1, path2) {
 
 var storeToken = function storeToken(oauth) {
     if (useSessionStore) {
-        localStorage.set("forceOAuth", oauth);
+        localStorage.setItem("forceOAuth", oauth);
     } else {
         tokenStore.forceOAuth = oauth;
     }
 };
-
-/*let retrieveToken = () => {
-    if (useSessionStore) {
-        return localStorage.get("forceOAuth");
-    } else {
-        return JSON.parse(tokenStore.forceOAuth);
-    }
-}*/
 
 /**
  * Initialize ForceJS

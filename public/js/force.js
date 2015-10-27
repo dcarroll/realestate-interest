@@ -173,19 +173,11 @@ let joinPaths = (path1, path2) => {
 
 let storeToken = (oauth) => {
     if (useSessionStore) {
-        localStorage.set("forceOAuth", oauth);
+        localStorage.setItem("forceOAuth", oauth);
     } else {
         tokenStore.forceOAuth = oauth;
     }
 }
-
-/*let retrieveToken = () => {
-    if (useSessionStore) {
-        return localStorage.get("forceOAuth");
-    } else {
-        return JSON.parse(tokenStore.forceOAuth);
-    }
-}*/
 
 /**
  * Initialize ForceJS
