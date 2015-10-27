@@ -227,7 +227,6 @@ export let init = (params) => {
     }
 
     console.log("useProxy: " + useProxy);
-    resolve();
 };
 
 /**

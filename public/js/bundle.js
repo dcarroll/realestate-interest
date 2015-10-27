@@ -532,7 +532,6 @@ var init = function init(params) {
     }
 
     console.log("useProxy: " + useProxy);
-    resolve();
 };
 
 exports.init = init;
