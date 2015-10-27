@@ -561,6 +561,7 @@ var _settings = {};
 
 exports._settings = _settings;
 var saveSetting = function saveSetting(name, value) {
+	debugger;
 	app._settings.set(name, value);
 	app._settings.saveAsync();
 };

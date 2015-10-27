@@ -9,6 +9,7 @@ let oauth = {};
 export let _settings = {};
 
 export let saveSetting = (name, value) => {
+	debugger;
 	app._settings.set(name, value);
 	app._settings.saveAsync();
 };
