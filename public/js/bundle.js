@@ -555,15 +555,14 @@ var forcejs = _interopRequireWildcard(_forcejs);
 
 'use strict';
 
-var app = {};
 var oauth = {};
 var _settings = {};
 
 exports._settings = _settings;
 var saveSetting = function saveSetting(name, value) {
 	debugger;
-	app._settings.set(name, value);
-	app._settings.saveAsync();
+	_settings.set(name, value);
+	_settings.saveAsync();
 };
 
 exports.saveSetting = saveSetting;

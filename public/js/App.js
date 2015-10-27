@@ -4,14 +4,13 @@ import * as forcejs from 'forcejs';
 
 'use strict';
 
-let app = {};
 let oauth = {};
 export let _settings = {};
 
 export let saveSetting = (name, value) => {
 	debugger;
-	app._settings.set(name, value);
-	app._settings.saveAsync();
+	_settings.set(name, value);
+	_settings.saveAsync();
 };
 
 export let clearLogin = () => {
