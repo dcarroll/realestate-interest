@@ -1,7 +1,7 @@
 ﻿/* global Office */
 // Common app functionality
 import * as forcejs from 'forcejs';
-import * as lightning from './lightning-config';
+import * as lightning from 'lightning-out-es6';
 
 'use strict';
 

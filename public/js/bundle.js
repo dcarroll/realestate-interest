@@ -547,6 +547,78 @@ var chatter = function chatter(pathOrParams) {
 exports.chatter = chatter;
 
 },{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
+
+var _lightningOutEs6 = require('lightning-out-es6');
+
+var lightningOut = _interopRequireWildcard(_lightningOutEs6);
+
+// Config vars area
+// vars are loApp - name of the lightning out app
+// targetElementId - Id of the element in which to render the app
+var lightningOutConfig = undefined;
+
+var init = function init(config) {
+	if (!config) {
+		throw new ReferenceError("Missing config for 'init' function.", "lightning-config.js", 9);
+	} else if (!config.loApp) {
+		throw new ReferenceError("Missing lightning out application paramater (loApp).", "lightning-config.js", 9);
+	} else if (!config.targetElementId) {
+		throw new ReferenceError("Missing target element id paramater (targetElementId).", "lightning-config.js", 9);
+	} else {
+		lightningOutConfig = config;
+	}
+};
+
+exports.init = init;
+var _lightningReady = false;
+
+var createComponent = function createComponent(type, attributes, locator, callback) {
+	if (lightningOutConfig) {
+		lightningOut.createComponent(type, attributes, locator, callback);
+	} else {
+		throw new ReferenceError("Missing config for lightning out.", "lightning-config.js", 25);
+	}
+};
+
+exports.createComponent = createComponent;
+var setupLightning = function setupLightning(callback, oauth) {
+	if (lightningOutConfig) {
+		var appName = lightningOutConfig.loApp;
+		if (!oauth) {
+			alert("Please login to Salesforce.com first!");
+			return;
+		}
+
+		if (_lightningReady) {
+			if (typeof callback === "function") {
+				callback();
+			}
+		} else {
+			// Transform the URL for Lightning
+			var anchor = document.createElement('a');
+			anchor.href = oauth.instance_url;
+			var mydomain = anchor.hostname.split(".")[0];
+			var url = anchor.protocol + "//" + mydomain + ".lightning.force.com";
+			lightningOut.use(appName, function () {
+				_lightningReady = true;
+				document.getElementById(lightningOutConfig.targetElementId).style.display = "";
+				if (typeof callback === "function") {
+					callback();
+				}
+			}, url, oauth.access_token);
+		}
+	} else {
+		throw new ReferenceError("Missing config for lightning out.", "lightning-config.js", 32);
+	}
+};
+exports.setupLightning = setupLightning;
 /* global $Lightning */
 "use strict";
 
@@ -724,7 +796,7 @@ var lightningLoaded = function lightningLoaded() {
 };
 exports.lightningLoaded = lightningLoaded;
 
-},{}],3:[function(require,module,exports){
+},{"lightning-out-es6":2}],3:[function(require,module,exports){
 /* global Office */
 // Common app functionality
 'use strict';
@@ -739,9 +811,9 @@ var _forcejs = require('forcejs');
 
 var forcejs = _interopRequireWildcard(_forcejs);
 
-var _lightningConfig = require('./lightning-config');
+var _lightningOutEs6 = require('lightning-out-es6');
 
-var lightning = _interopRequireWildcard(_lightningConfig);
+var lightning = _interopRequireWildcard(_lightningOutEs6);
 
 'use strict';
 
@@ -817,7 +889,7 @@ var forceLogin = function forceLogin(key) {
 exports.forceLogin = forceLogin;
 clearLoginLink.addEventListener("click", clearLogin);
 
-},{"./lightning-config":5,"forcejs":1}],4:[function(require,module,exports){
+},{"forcejs":1,"lightning-out-es6":2}],4:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
@@ -845,78 +917,4 @@ function clearLogin() {
 
 function addActivity() {};
 
-},{"./App":3}],5:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
-
-var _lightningOutEs6 = require('lightning-out-es6');
-
-var lightningOut = _interopRequireWildcard(_lightningOutEs6);
-
-// Config vars area
-// vars are loApp - name of the lightning out app
-// targetElementId - Id of the element in which to render the app
-var lightningOutConfig = undefined;
-
-var init = function init(config) {
-	if (!config) {
-		throw new ReferenceError("Missing config for 'init' function.", "lightning-config.js", 9);
-	} else if (!config.loApp) {
-		throw new ReferenceError("Missing lightning out application paramater (loApp).", "lightning-config.js", 9);
-	} else if (!config.targetElementId) {
-		throw new ReferenceError("Missing target element id paramater (targetElementId).", "lightning-config.js", 9);
-	} else {
-		lightningOutConfig = config;
-	}
-};
-
-exports.init = init;
-var _lightningReady = false;
-
-var createComponent = function createComponent(type, attributes, locator, callback) {
-	if (lightningOutConfig) {
-		lightningOut.createComponent(type, attributes, locator, callback);
-	} else {
-		throw new ReferenceError("Missing config for lightning out.", "lightning-config.js", 25);
-	}
-};
-
-exports.createComponent = createComponent;
-var setupLightning = function setupLightning(callback, oauth) {
-	if (lightningOutConfig) {
-		var appName = lightningOutConfig.loApp;
-		if (!oauth) {
-			alert("Please login to Salesforce.com first!");
-			return;
-		}
-
-		if (_lightningReady) {
-			if (typeof callback === "function") {
-				callback();
-			}
-		} else {
-			// Transform the URL for Lightning
-			var anchor = document.createElement('a');
-			anchor.href = oauth.instance_url;
-			var mydomain = anchor.hostname.split(".")[0];
-			var url = anchor.protocol + "//" + mydomain + ".lightning.force.com";
-			lightningOut.use(appName, function () {
-				_lightningReady = true;
-				document.getElementById(lightningOutConfig.targetElementId).style.display = "";
-				if (typeof callback === "function") {
-					callback();
-				}
-			}, url, oauth.access_token);
-		}
-	} else {
-		throw new ReferenceError("Missing config for lightning out.", "lightning-config.js", 32);
-	}
-};
-exports.setupLightning = setupLightning;
-
-},{"lightning-out-es6":2}]},{},[5,3,4]);
+},{"./App":3}]},{},[3,4]);
