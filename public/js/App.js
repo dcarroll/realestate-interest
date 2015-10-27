@@ -4,6 +4,8 @@ import * as forcejs from './force';
 
 'use strict';
 
+let clearLoginLink = document.getElementById('clearLogin')
+
 let oauth = {};
 export let _settings = {};
 
@@ -75,3 +77,4 @@ export let forceLogin = key => {
 	//});	
 };
 
+clearLoginLink.addEventListener("click", clearLogin);

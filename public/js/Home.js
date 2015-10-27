@@ -13,6 +13,7 @@ Office.initialize = function (reason) {
     });
 };
 
+
 function clearLogin() {
 	app.clearLogin();
 };
