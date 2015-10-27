@@ -1,10 +1,9 @@
 ﻿import * as lightningOut from 'lightning-out-es6';
 
 // Config vars area
-let lightningOutConfig = {
-	loApp,
-	targetElementId
-}
+// vars are loApp - name of the lightning out app
+// targetElementId - Id of the element in which to render the app
+let lightningOutConfig;
 
 export let init = (config) => {
 	if (!config) {

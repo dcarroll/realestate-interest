@@ -859,10 +859,9 @@ var _lightningOutEs6 = require('lightning-out-es6');
 var lightningOut = _interopRequireWildcard(_lightningOutEs6);
 
 // Config vars area
-var lightningOutConfig = {
-	loApp: loApp,
-	targetElementId: targetElementId
-};
+// vars are loApp - name of the lightning out app
+// targetElementId - Id of the element in which to render the app
+var lightningOutConfig = undefined;
 
 var init = function init(config) {
 	if (!config) {
