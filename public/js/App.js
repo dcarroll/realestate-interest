@@ -65,7 +65,8 @@ export let forceLogin = key => {
 			oauthCallbackURL:"https://realestate-interest-test.herokuapp.com/AppRead/oauthcallback",
 			useSessionStore:true
 		}
-	).then(() => forcejs.login())
+	);
+	forcejs.login()
 	.then(() => {
 		//saveSetting("oauth", oauth);
 		lightning.setupLightning(createComponent, JSON.parse(localStorage.get("forceOAuth")));
