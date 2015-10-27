@@ -220,7 +220,7 @@ var initialize = function initialize(settings) {
 	console.log("app.initialize 2");
 	exports._settings = _settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
-		localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
+		//localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
 		lightning.setupLightning(createComponent, JSON.parse(_settings.get("forceOAuth")));
 	} else {
 		forceLogin();
@@ -262,7 +262,10 @@ var forceLogin = function forceLogin(key) {
 	});
 	forcejs.login().then(function () {
 		//saveSetting("oauth", oauth);
-		lightning.setupLightning(createComponent, JSON.parse(localStorage.getItem("forceOAuth")));
+		lightning.setupLightning(createComponent, {
+			"instance_url": forcejs.getInstanceUrl(),
+			"access_token": forcejs.getAccessToken()
+		});
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
@@ -330,11 +333,8 @@ apiVersion = 'v35.0',
 // Keep track of OAuth data (access_token, refresh_token, and instance_url)
 oauth = undefined,
 
-// By default we store token in memory. This can be overridden in init()
+// By default we store fbtoken in sessionStorage. This can be overridden in init()
 tokenStore = {},
-
-// Keep track of the storage option
-useSessionStore = false,
 
 // if page URL is http://localhost:3000/myapp/index.html, context is /myapp
 context = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")),
@@ -410,7 +410,7 @@ var refreshTokenWithPlugin = function refreshTokenWithPlugin() {
     return new Promise(function (resolve, reject) {
         oauthPlugin.authenticate(function (response) {
             oauth.access_token = response.accessToken;
-            storeToken(JSON.stringify(oauth));
+            tokenStore.forceOAuth = JSON.stringify(oauth);
             resolve();
         }, function () {
             console.error('Error refreshing oauth access token using the oauth plugin');
@@ -444,7 +444,7 @@ var refreshTokenWithHTTPRequest = function refreshTokenWithHTTPRequest() {
                     console.log('Token refreshed');
                     var res = JSON.parse(xhr.responseText);
                     oauth.access_token = res.access_token;
-                    storeToken(JSON.stringify(oauth));
+                    tokenStore.forceOAuth = JSON.stringify(oauth);
                     resolve();
                 } else {
                     console.log('Error while trying to refresh token: ' + xhr.responseText);
@@ -475,14 +475,6 @@ var joinPaths = function joinPaths(path1, path2) {
     return path1 + path2;
 };
 
-var storeToken = function storeToken(oauth) {
-    if (useSessionStore) {
-        localStorage.setItem("forceOAuth", oauth);
-    } else {
-        tokenStore.forceOAuth = oauth;
-    }
-};
-
 /**
  * Initialize ForceJS
  * @param params
@@ -504,7 +496,6 @@ var init = function init(params) {
         oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
         proxyURL = params.proxyURL || proxyURL;
         useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
-        useSessionStore = params.useSessionStore || useSessionStore;
 
         if (params.accessToken) {
             if (!oauth) oauth = {};
@@ -531,7 +522,7 @@ exports.init = init;
  */
 var discardToken = function discardToken() {
     delete oauth.access_token;
-    storeToken(JSON.stringify(oauth));
+    tokenStore.forceOAuth = JSON.stringify(oauth);
 };
 
 exports.discardToken = discardToken;
@@ -593,7 +584,7 @@ var loginWithBrowser = function loginWithBrowser() {
                 queryString = url.substr(url.indexOf('#') + 1);
                 obj = parseQueryString(queryString);
                 oauth = obj;
-                storeToken(JSON.stringify(oauth));
+                tokenStore.forceOAuth = JSON.stringify(oauth);
                 resolve();
             } else if (url.indexOf("error=") > 0) {
                 queryString = decodeURIComponent(url.substring(url.indexOf('?') + 1));
@@ -618,6 +609,24 @@ var getUserId = function getUserId() {
 };
 
 exports.getUserId = getUserId;
+/**
+ * Gets the access token (if logged in)
+ * @returns {string} | undefined
+ */
+var getAccessToken = function getAccessToken() {
+    return oauth ? oauth.access_token : undefined;
+};
+
+exports.getAccessToken = getAccessToken;
+/**
+ * Gets the instance_url (if logged in)
+ * @returns {string} | undefined
+ */
+var getInstanceUrl = function getInstanceUrl() {
+    return oauth ? oauth.instance_url : undefined;
+};
+
+exports.getInstanceUrl = getInstanceUrl;
 /**
  * Check the login status
  * @returns {boolean}

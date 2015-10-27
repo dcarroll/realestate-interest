@@ -26,7 +26,7 @@ export let initialize = (settings) => {
 	console.log("app.initialize 2");
 	_settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
-		localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
+		//localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
 		lightning.setupLightning(createComponent, JSON.parse(_settings.get("forceOAuth")));
 	} else {
 		forceLogin();
@@ -69,7 +69,11 @@ export let forceLogin = key => {
 	forcejs.login()
 	.then(() => {
 		//saveSetting("oauth", oauth);
-		lightning.setupLightning(createComponent, JSON.parse(localStorage.getItem("forceOAuth")));
+		lightning.setupLightning(createComponent, { 
+				"instance_url": forcejs.getInstanceUrl(),
+				"access_token": forcejs.getAccessToken()
+			}
+		);
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {

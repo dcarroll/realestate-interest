@@ -21,11 +21,8 @@ let // The login URL for the OAuth process
     // Keep track of OAuth data (access_token, refresh_token, and instance_url)
     oauth,
 
-    // By default we store token in memory. This can be overridden in init()
+    // By default we store fbtoken in sessionStorage. This can be overridden in init()
     tokenStore = {},
-
-    // Keep track of the storage option
-    useSessionStore = false,
 
     // if page URL is http://localhost:3000/myapp/index.html, context is /myapp
     context = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")),
@@ -102,7 +99,7 @@ let refreshTokenWithPlugin = () => {
         oauthPlugin.authenticate(
             function (response) {
                 oauth.access_token = response.accessToken;
-                storeToken(JSON.stringify(oauth));
+                tokenStore.forceOAuth = JSON.stringify(oauth);
                 resolve();
             },
             function () {
@@ -140,7 +137,7 @@ let refreshTokenWithHTTPRequest = () => new Promise((resolve, reject) => {
                 console.log('Token refreshed');
                 let res = JSON.parse(xhr.responseText);
                 oauth.access_token = res.access_token;
-                storeToken(JSON.stringify(oauth));
+                tokenStore.forceOAuth = JSON.stringify(oauth);
                 resolve();
             } else {
                 console.log('Error while trying to refresh token: ' + xhr.responseText);
@@ -171,14 +168,6 @@ let joinPaths = (path1, path2) => {
     return path1 + path2;
 }
 
-let storeToken = (oauth) => {
-    if (useSessionStore) {
-        localStorage.setItem("forceOAuth", oauth);
-    } else {
-        tokenStore.forceOAuth = oauth;
-    }
-}
-
 /**
  * Initialize ForceJS
  * @param params
@@ -191,7 +180,7 @@ let storeToken = (oauth) => {
  *  instanceURL (optional)
  *  refreshToken (optional)
  */
-export let init = (params) => {
+export let init = params => {
 
     if (params) {
         appId = params.appId || appId;
@@ -200,8 +189,7 @@ export let init = (params) => {
         oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
         proxyURL = params.proxyURL || proxyURL;
         useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
-        useSessionStore = params.useSessionStore || useSessionStore;
-        
+
         if (params.accessToken) {
             if (!oauth) oauth = {};
             oauth.access_token = params.accessToken;
@@ -219,6 +207,7 @@ export let init = (params) => {
     }
 
     console.log("useProxy: " + useProxy);
+
 };
 
 /**
@@ -226,7 +215,7 @@ export let init = (params) => {
  */
 export let discardToken = () => {
     delete oauth.access_token;
-    storeToken(JSON.stringify(oauth));
+    tokenStore.forceOAuth = JSON.stringify(oauth);
 };
 
 /**
@@ -285,7 +274,7 @@ export let loginWithBrowser = () => new Promise((resolve, reject) => {
             queryString = url.substr(url.indexOf('#') + 1);
             obj = parseQueryString(queryString);
             oauth = obj;
-            storeToken(JSON.stringify(oauth));
+            tokenStore.forceOAuth = JSON.stringify(oauth);
             resolve();
         } else if (url.indexOf("error=") > 0) {
             queryString = decodeURIComponent(url.substring(url.indexOf('?') + 1));
@@ -306,6 +295,18 @@ export let loginWithBrowser = () => new Promise((resolve, reject) => {
  * @returns {string} | undefined
  */
 export let getUserId = () => (typeof(oauth) !== 'undefined') ? oauth.id.split('/').pop() : undefined;
+
+/**
+ * Gets the access token (if logged in)
+ * @returns {string} | undefined
+ */
+export let getAccessToken = () => (oauth) ? oauth.access_token : undefined;
+
+/**
+ * Gets the instance_url (if logged in)
+ * @returns {string} | undefined
+ */
+export let getInstanceUrl = () => (oauth) ? oauth.instance_url : undefined;
 
 /**
  * Check the login status
