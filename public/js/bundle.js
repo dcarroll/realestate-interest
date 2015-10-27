@@ -609,12 +609,15 @@ var forceLogin = function forceLogin(key) {
 		oauthCallbackURL: "https://realestate-interest-test.herokuapp.com/AppRead/oauthcallback",
 		tokenStore: oauth
 	});
-	forcejs.login().saveSetting("oauth", oauth);
+	forcejs.login().then(function () {
+		saveSetting("oauth", oauth);
+		setupLightning(createComponent);
+	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
 	//saveSetting("oauth", oauth);
 
-	setupLightning(app.createComponent);
+	//setupLightning(app.createComponent);
 	//});	
 };
 exports.forceLogin = forceLogin;
