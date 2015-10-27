@@ -4,7 +4,7 @@
   "description": "A sample app for Lightning Out in O365",
   "main": "index.js",
   "scripts": {
-    "compile": "browserify public/js/App.js public/js/Home.js -t babelify -o public/js/bundle.js",
+    "compile": "browserify public/js/lightning-out-es6.js public/js/App.js public/js/force.js public/js/Home.js -t babelify -o public/js/bundle.js",
     "start": "node index.js"
   },
   "author": "Dave Carroll",

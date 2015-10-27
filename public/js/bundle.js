@@ -13,7 +13,13 @@ var _force = require('./force');
 
 var forcejs = _interopRequireWildcard(_force);
 
+var _lightningOutEs6 = require('./lightning-out-es6');
+
+var lightningOout = _interopRequireWildcard(_lightningOutEs6);
+
 'use strict';
+
+var clearLoginLink = document.getElementById('clearLogin');
 
 var oauth = {};
 var _settings = {};
@@ -79,7 +85,7 @@ var forceLogin = function forceLogin(key) {
 		return forcejs.login();
 	}).then(function () {
 		saveSetting("oauth", oauth);
-		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightningOut.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
@@ -88,9 +94,11 @@ var forceLogin = function forceLogin(key) {
 	//setupLightning(app.createComponent);
 	//});	
 };
-exports.forceLogin = forceLogin;
 
-},{"./force":3}],2:[function(require,module,exports){
+exports.forceLogin = forceLogin;
+clearLoginLink.addEventListener("click", clearLogin);
+
+},{"./force":3,"./lightning-out-es6":4}],2:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
@@ -662,4 +670,178 @@ var chatter = function chatter(pathOrParams) {
 };
 exports.chatter = chatter;
 
-},{}]},{},[1,2]);
+},{}],4:[function(require,module,exports){
+/* global $Lightning */
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var _applicationTag;
+
+var _pendingReadyRequests = [],
+    _ready = false;
+
+var use = function use(applicationTag, callback, lightningEndPointURI, authToken) {
+	if (_applicationTag && _applicationTag !== applicationTag) {
+		throw new Error("$Lightning.use() already invoked with application: " + _applicationTag);
+	}
+
+	if (!_applicationTag) {
+		_applicationTag = applicationTag;
+		_pendingReadyRequests = [];
+		_ready = false;
+
+		var parts = applicationTag.split(":");
+		var url = (lightningEndPointURI || "") + "/" + parts[0] + "/" + parts[1] + ".app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT";
+
+		var xhr = new XMLHttpRequest();
+
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				var config = JSON.parse(xhr.responseText);
+				var auraInitConfig = config.auraInitConfig;
+
+				$Lightning.addScripts(config.scripts, function () {
+					$A.initConfig(auraInitConfig, true);
+
+					$Lightning.lightningLoaded();
+				});
+
+				var styles = config.styles;
+				for (var n = 0; n < styles.length; n++) {
+					$Lightning.addStyle(styles[n]);
+				}
+			}
+		};
+
+		xhr.open("GET", url, true);
+
+		if (authToken) {
+			xhr.withCredentials = true;
+			xhr.setRequestHeader("Authorization", authToken);
+		}
+
+		xhr.send();
+	}
+
+	ready(function () {
+		// Request labels
+		$A.enqueueAction($A.get("c.aura://ComponentController.loadLabels"));
+	});
+
+	if (callback) {
+		ready(callback);
+	}
+};
+
+exports.use = use;
+var ready = function ready(callback) {
+	if (_ready) {
+		$A.run(callback);
+	} else {
+		_pendingReadyRequests.push(callback);
+	}
+};
+
+var createComponent = function createComponent(type, attributes, locator, callback) {
+	// Check to see if we know about the component - enforce aura:dependency
+	// is used to avoid silent performance killer
+	var unknownComponent;
+	try {
+		unknownComponent = $A.componentService.getDef(type) === undefined;
+	} catch (e) {
+		if ("Unknown component: markup://" + type === e.message) {
+			unknownComponent = true;
+		} else {
+			throw e;
+		}
+	}
+
+	if (unknownComponent) {
+		throw new Error("No component definiton for " + type + " in the client registry - add <aura:dependency resource=\"" + type + "\"/> to " + _applicationTag + ".");
+	} else {
+		$A.run(function () {
+			var config = {
+				componentDef: "markup://" + type,
+				attributes: {
+					values: attributes
+				}
+			};
+
+			$A.createComponent(type, attributes, function (component, status, statusMessage) {
+				var error = null;
+
+				var stringLocator = $A.util.isString(locator);
+				var hostEl = stringLocator ? document.getElementById(locator) : locator;
+
+				if (!hostEl) {
+					error = "Invalid locator specified - " + (stringLocator ? "no element found in the DOM with id=" + locator : "locator element not provided");
+				} else if (status !== "SUCCESS") {
+					error = statusMessage;
+				}
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				$A.render(component, hostEl);
+				$A.afterRender(component);
+
+				if (callback) {
+					callback(component);
+				}
+			});
+		});
+	}
+};
+
+exports.createComponent = createComponent;
+var addScripts = function addScripts(urls, onload) {
+	var url = urls[0];
+	urls = urls.slice(1);
+
+	var script = document.createElement("SCRIPT");
+	script.type = "text/javascript";
+	script.src = url;
+
+	if (urls.length > 0) {
+		script.onload = function () {
+			addScripts(urls, onload);
+		};
+	} else {
+		script.onload = onload;
+	}
+
+	var head = document.getElementsByTagName("HEAD")[0];
+	head.appendChild(script);
+};
+
+var addStyle = function addStyle(url) {
+	var link = document.createElement("LINK");
+	link.href = url;
+	link.type = "text/css";
+	link.rel = "stylesheet";
+
+	var head = document.getElementsByTagName("HEAD")[0];
+	head.appendChild(link);
+};
+
+var lightningLoaded = function lightningLoaded() {
+	_ready = true;
+
+	// DCHASMAN TODO Add auraErrorMessage UI - figure out a better way to
+	// handle this!
+	if (!document.getElementById("auraErrorMessage")) {
+		var div = document.createElement("DIV");
+		div.id = "auraErrorMessage";
+		document.body.appendChild(div);
+	}
+
+	for (var n = 0; n < _pendingReadyRequests.length; n++) {
+		_pendingReadyRequests[n]();
+	}
+};
+exports.lightningLoaded = lightningLoaded;
+
+},{}]},{},[4,1,3,2]);
