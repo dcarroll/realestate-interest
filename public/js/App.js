@@ -57,8 +57,8 @@ export let forceLogin = key => {
 			oauthCallbackURL:"https://realestate-interest-test.herokuapp.com/AppRead/oauthcallback",
 			tokenStore:oauth
 		}
-	);
-	forcejs.login().then(() => {
+	).then(() => forcejs.login())
+	.then(() => {
 		saveSetting("oauth", oauth);
 		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});

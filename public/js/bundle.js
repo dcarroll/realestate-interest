@@ -71,8 +71,9 @@ var forceLogin = function forceLogin(key) {
 		appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2",
 		oauthCallbackURL: "https://realestate-interest-test.herokuapp.com/AppRead/oauthcallback",
 		tokenStore: oauth
-	});
-	forcejs.login().then(function () {
+	}).then(function () {
+		return forcejs.login();
+	}).then(function () {
 		saveSetting("oauth", oauth);
 		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
@@ -131,7 +132,7 @@ loginURL = 'https://login.salesforce.com',
 // The Connected App client Id. Default app id provided - Not for production use.
 // This application supports http://localhost:8200/oauthcallback.html as a valid callback URL
 // To override default, pass appId in init(props)
-appId = '3MVG9fMtCkV6eLheIEZplMqWfnGlf3Y.BcWdOf1qytXo9zxgbsrUbS.ExHTgUPJeb3jZeT8NYhc.hMyznKU92',
+appId = '3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2',
 
 // The force.com API version to use.
 // To override default, pass apiVersion in init(props)
@@ -158,7 +159,7 @@ proxyURL = baseURL,
 
 // if page URL is http://localhost:3000/myapp/index.html, oauthCallbackURL is http://localhost:3000/myapp/oauthcallback.html
 // To override default, pass oauthCallbackURL in init(props)
-oauthCallbackURL = baseURL + '/oauthcallback.html',
+oauthCallbackURL = baseURL + '/oauthcallback',
 
 // Reference to the Salesforce OAuth plugin
 oauthPlugin = undefined,
@@ -295,33 +296,36 @@ var joinPaths = function joinPaths(path1, path2) {
  *  refreshToken (optional)
  */
 var init = function init(params) {
+    return new Promise(function (resolve, reject) {
 
-    if (params) {
-        appId = params.appId || appId;
-        apiVersion = params.apiVersion || apiVersion;
-        loginURL = params.loginURL || loginURL;
-        oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
-        proxyURL = params.proxyURL || proxyURL;
-        useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
-        tokenStore = params.tokenStore || tokenStore;
+        if (params) {
+            appId = params.appId || appId;
+            apiVersion = params.apiVersion || apiVersion;
+            loginURL = params.loginURL || loginURL;
+            oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
+            proxyURL = params.proxyURL || proxyURL;
+            useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
+            tokenStore = params.tokenStore || tokenStore;
 
-        if (params.accessToken) {
-            if (!oauth) oauth = {};
-            oauth.access_token = params.accessToken;
+            if (params.accessToken) {
+                if (!oauth) oauth = {};
+                oauth.access_token = params.accessToken;
+            }
+
+            if (params.instanceURL) {
+                if (!oauth) oauth = {};
+                oauth.instance_url = params.instanceURL;
+            }
+
+            if (params.refreshToken) {
+                if (!oauth) oauth = {};
+                oauth.refresh_token = params.refreshToken;
+            }
         }
 
-        if (params.instanceURL) {
-            if (!oauth) oauth = {};
-            oauth.instance_url = params.instanceURL;
-        }
-
-        if (params.refreshToken) {
-            if (!oauth) oauth = {};
-            oauth.refresh_token = params.refreshToken;
-        }
-    }
-
-    console.log("useProxy: " + useProxy);
+        console.log("useProxy: " + useProxy);
+        resolve();
+    });
 };
 
 exports.init = init;
