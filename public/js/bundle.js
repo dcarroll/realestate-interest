@@ -739,7 +739,7 @@ var _pendingReadyRequests = [],
 
 var use = function use(applicationTag, callback, lightningEndPointURI, authToken) {
 	if (_applicationTag && _applicationTag !== applicationTag) {
-		throw new Error("$Lightning.use() already invoked with application: " + _applicationTag);
+		throw new Error("Lightning.use() already invoked with application: " + _applicationTag);
 	}
 
 	if (!_applicationTag) {
