@@ -7,7 +7,6 @@ import * as lightning from './lightning-config';
 
 let clearLoginLink = document.getElementById('clearLogin')
 
-let oauth = {};
 export let _settings = {};
 
 export let saveSetting = (name, value) => {
@@ -16,14 +15,14 @@ export let saveSetting = (name, value) => {
 	_settings.saveAsync();
 };
 
-var clearLogin = () => {
+export let clearLogin = () => {
 	_settings.remove("forceOAuth");
 	_settings.saveAsync();
 };
 
 // Common initialization function (to be called from each page)
 export let initialize = (settings) => {
-	console.log("app.initialize 2");
+	lightning.init();
 	_settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
 		//localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
@@ -71,12 +70,6 @@ export let forceLogin = key => {
 		saveSetting("forceOAuth", JSON.stringify(forcejs.getOAuthResult()));
 		lightning.setupLightning(createComponent, forcejs.getOAuthResult());
 	});
-	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
-	//force.login(function(success) {
-		//saveSetting("oauth", oauth);
-
-		//setupLightning(app.createComponent);
-	//});	
 };
 
 clearLoginLink.addEventListener("click", clearLogin);

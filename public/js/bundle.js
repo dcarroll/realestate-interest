@@ -747,7 +747,6 @@ var lightning = _interopRequireWildcard(_lightningConfig);
 
 var clearLoginLink = document.getElementById('clearLogin');
 
-var oauth = {};
 var _settings = {};
 
 exports._settings = _settings;
@@ -763,9 +762,10 @@ var clearLogin = function clearLogin() {
 	_settings.saveAsync();
 };
 
+exports.clearLogin = clearLogin;
 // Common initialization function (to be called from each page)
 var initialize = function initialize(settings) {
-	console.log("app.initialize 2");
+	lightning.init();
 	exports._settings = _settings = settings;
 	if (_settings.get("forceOAuth") != undefined) {
 		//localStorage.setItem("forceOAuth", _settings.get("forceOAuth"));
@@ -812,12 +812,6 @@ var forceLogin = function forceLogin(key) {
 		saveSetting("forceOAuth", JSON.stringify(forcejs.getOAuthResult()));
 		lightning.setupLightning(createComponent, forcejs.getOAuthResult());
 	});
-	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
-	//force.login(function(success) {
-	//saveSetting("oauth", oauth);
-
-	//setupLightning(app.createComponent);
-	//});	
 };
 
 exports.forceLogin = forceLogin;
@@ -865,43 +859,63 @@ var _lightningOutEs6 = require('lightning-out-es6');
 var lightningOut = _interopRequireWildcard(_lightningOutEs6);
 
 // Config vars area
-var config = {
-	appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2",
-	loApp: "c:HouseExplorerLOApp",
-	targetElementId: "lightning"
+var lightningOutConfig = {
+	loApp: loApp,
+	targetElementId: targetElementId
 };
 
+var init = function init(config) {
+	if (!config) {
+		throw new ReferenceError("Missing config for 'init' function.", "lightning-config.js", 9);
+	} else if (!config.loApp) {
+		throw new ReferenceError("Missing lightning out application paramater (loApp).", "lightning-config.js", 9);
+	} else if (!config.targetElementId) {
+		throw new ReferenceError("Missing target element id paramater (targetElementId).", "lightning-config.js", 9);
+	} else {
+		lightningOutConfig = config;
+	}
+};
+
+exports.init = init;
 var _lightningReady = false;
 
 var createComponent = function createComponent(type, attributes, locator, callback) {
-	lightningOut.createComponent(type, attributes, locator, callback);
+	if (lightningOutConfig) {
+		lightningOut.createComponent(type, attributes, locator, callback);
+	} else {
+		throw new ReferenceError("Missing config for lightning out.", "lightning-config.js", 25);
+	}
 };
 
 exports.createComponent = createComponent;
 var setupLightning = function setupLightning(callback, oauth) {
-	var appName = config.loApp;
-	if (!oauth) {
-		alert("Please login to Salesforce.com first!");
-		return;
-	}
-
-	if (_lightningReady) {
-		if (typeof callback === "function") {
-			callback();
+	if (lightningOutConfig) {
+		var appName = config.loApp;
+		if (!oauth) {
+			alert("Please login to Salesforce.com first!");
+			return;
 		}
-	} else {
-		// Transform the URL for Lightning
-		var anchor = document.createElement('a');
-		anchor.href = oauth.instance_url;
-		var mydomain = anchor.hostname.split(".")[0];
-		var url = anchor.protocol + "//" + mydomain + ".lightning.force.com";
-		lightningOut.use(appName, function () {
-			_lightningReady = true;
-			document.getElementById(config.targetElementId).style.display = "";
+
+		if (_lightningReady) {
 			if (typeof callback === "function") {
 				callback();
 			}
-		}, url, oauth.access_token);
+		} else {
+			// Transform the URL for Lightning
+			var anchor = document.createElement('a');
+			anchor.href = oauth.instance_url;
+			var mydomain = anchor.hostname.split(".")[0];
+			var url = anchor.protocol + "//" + mydomain + ".lightning.force.com";
+			lightningOut.use(appName, function () {
+				_lightningReady = true;
+				document.getElementById(config.targetElementId).style.display = "";
+				if (typeof callback === "function") {
+					callback();
+				}
+			}, url, oauth.access_token);
+		}
+	} else {
+		throw new ReferenceError("Missing config for lightning out.", "lightning-config.js", 32);
 	}
 };
 exports.setupLightning = setupLightning;
