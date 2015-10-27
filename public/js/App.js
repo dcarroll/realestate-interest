@@ -14,15 +14,20 @@ export let saveSetting = (name, value) => {
 };
 
 export let clearLogin = () => {
-	app._settings.remove("oauth");
-	app._settings.saveAsync();
+	_settings.remove("oauth");
+	_settings.saveAsync();
 };
 
 // Common initialization function (to be called from each page)
 export let initialize = (settings) => {
 	console.log("app.initialize 2");
 	_settings = settings;
-	forceLogin();
+	if (_settings.get("oauth") != undefined) {
+		oauth = _settings.get("oauth");
+		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+	} else {
+		forceLogin();
+	}
 };
 
 export let getMessageData = () => {

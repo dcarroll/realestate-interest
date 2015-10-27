@@ -27,8 +27,8 @@ var saveSetting = function saveSetting(name, value) {
 
 exports.saveSetting = saveSetting;
 var clearLogin = function clearLogin() {
-	app._settings.remove("oauth");
-	app._settings.saveAsync();
+	_settings.remove("oauth");
+	_settings.saveAsync();
 };
 
 exports.clearLogin = clearLogin;
@@ -36,7 +36,12 @@ exports.clearLogin = clearLogin;
 var initialize = function initialize(settings) {
 	console.log("app.initialize 2");
 	exports._settings = _settings = settings;
-	forceLogin();
+	if (_settings.get("oauth") != undefined) {
+		oauth = _settings.get("oauth");
+		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+	} else {
+		forceLogin();
+	}
 };
 
 exports.initialize = initialize;
