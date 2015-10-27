@@ -1,4 +1,182 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* global $Lightning */
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var _applicationTag;
+
+var _pendingReadyRequests = [],
+    _ready = false;
+
+var use = function use(applicationTag, callback, lightningEndPointURI, authToken) {
+	if (_applicationTag && _applicationTag !== applicationTag) {
+		throw new Error("Lightning.use() already invoked with application: " + _applicationTag);
+	}
+
+	if (!_applicationTag) {
+		_applicationTag = applicationTag;
+		_pendingReadyRequests = [];
+		_ready = false;
+
+		var parts = applicationTag.split(":");
+		var url = (lightningEndPointURI || "") + "/" + parts[0] + "/" + parts[1] + ".app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT";
+
+		var xhr = new XMLHttpRequest();
+
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				var config = JSON.parse(xhr.responseText);
+				var auraInitConfig = config.auraInitConfig;
+
+				addScripts(config.scripts, function () {
+					$A.initConfig(auraInitConfig, true);
+					lightningLoaded();
+				});
+
+				var styles = config.styles;
+				for (var n = 0; n < styles.length; n++) {
+					addStyle(styles[n]);
+				}
+			}
+		};
+
+		xhr.open("GET", url, true);
+
+		if (authToken) {
+			xhr.withCredentials = true;
+			xhr.setRequestHeader("Authorization", authToken);
+		}
+
+		xhr.send();
+	}
+
+	ready(function () {
+		// Request labels
+		$A.enqueueAction($A.get("c.aura://ComponentController.loadLabels"));
+	});
+
+	if (callback) {
+		ready(callback);
+	}
+};
+
+exports.use = use;
+var ready = function ready(callback) {
+	if (_ready) {
+		$A.run(callback);
+	} else {
+		_pendingReadyRequests.push(callback);
+	}
+};
+
+var createComponent = function createComponent(type, attributes, locator, callback) {
+	// Check to see if we know about the component - enforce aura:dependency
+	// is used to avoid silent performance killer
+	var unknownComponent;
+	try {
+		unknownComponent = $A.componentService.getDef(type) === undefined;
+	} catch (e) {
+		if ("Unknown component: markup://" + type === e.message) {
+			unknownComponent = true;
+		} else {
+			throw e;
+		}
+	}
+
+	if (unknownComponent) {
+		throw new Error("No component definiton for " + type + " in the client registry - add <aura:dependency resource=\"" + type + "\"/> to " + _applicationTag + ".");
+	} else {
+		$A.run(function () {
+			var config = {
+				componentDef: "markup://" + type,
+				attributes: {
+					values: attributes
+				}
+			};
+
+			$A.createComponent(type, attributes, function (component, status, statusMessage) {
+				var error = null;
+
+				var stringLocator = $A.util.isString(locator);
+				var hostEl = stringLocator ? document.getElementById(locator) : locator;
+
+				if (!hostEl) {
+					error = "Invalid locator specified - " + (stringLocator ? "no element found in the DOM with id=" + locator : "locator element not provided");
+				} else if (status !== "SUCCESS") {
+					error = statusMessage;
+				}
+
+				if (error) {
+					throw new Error(error);
+				}
+
+				$A.render(component, hostEl);
+				$A.afterRender(component);
+
+				if (callback) {
+					callback(component);
+				}
+			});
+		});
+	}
+};
+
+exports.createComponent = createComponent;
+var addScripts = function addScripts(urls, onload) {
+	var url = urls[0];
+	urls = urls.slice(1);
+
+	var script = document.createElement("SCRIPT");
+	script.type = "text/javascript";
+	script.src = url;
+
+	if (urls.length > 0) {
+		script.onload = function () {
+			addScripts(urls, onload);
+		};
+	} else {
+		script.onload = onload;
+	}
+
+	var head = document.getElementsByTagName("HEAD")[0];
+	head.appendChild(script);
+};
+
+var addStyle = function addStyle(url) {
+	var link = document.createElement("LINK");
+	link.href = url;
+	link.type = "text/css";
+	link.rel = "stylesheet";
+
+	var head = document.getElementsByTagName("HEAD")[0];
+	head.appendChild(link);
+};
+
+var printMsg = function printMsg() {
+	console.log("This is a message from the demo package");
+};
+
+exports.printMsg = printMsg;
+var lightningLoaded = function lightningLoaded() {
+	_ready = true;
+
+	// DCHASMAN TODO Add auraErrorMessage UI - figure out a better way to
+	// handle this!
+	if (!document.getElementById("auraErrorMessage")) {
+		var div = document.createElement("DIV");
+		div.id = "auraErrorMessage";
+		document.body.appendChild(div);
+	}
+
+	for (var n = 0; n < _pendingReadyRequests.length; n++) {
+		_pendingReadyRequests[n]();
+	}
+};
+exports.lightningLoaded = lightningLoaded;
+
+},{}],2:[function(require,module,exports){
 /* global Office */
 // Common app functionality
 'use strict';
@@ -33,7 +211,7 @@ var saveSetting = function saveSetting(name, value) {
 
 exports.saveSetting = saveSetting;
 var clearLogin = function clearLogin() {
-	_settings.remove("oauth");
+	_settings.remove("forceOAuth");
 	_settings.saveAsync();
 };
 
@@ -41,9 +219,9 @@ var clearLogin = function clearLogin() {
 var initialize = function initialize(settings) {
 	console.log("app.initialize 2");
 	exports._settings = _settings = settings;
-	if (_settings.get("oauth") != undefined) {
-		oauth = _settings.get("oauth");
-		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+	if (_settings.get("forceOAuth") != undefined) {
+		localStorage.set("forceOAuth", _settings.get("forceOAuth"));
+		lightning.setupLightning(createComponent, JSON.parse(_settings.get("forceOAuth")));
 	} else {
 		forceLogin();
 	}
@@ -80,12 +258,12 @@ var forceLogin = function forceLogin(key) {
 	forcejs.init({
 		appId: "3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2",
 		oauthCallbackURL: "https://realestate-interest-test.herokuapp.com/AppRead/oauthcallback",
-		tokenStore: oauth
+		useSessionStore: true
 	}).then(function () {
 		return forcejs.login();
 	}).then(function () {
-		saveSetting("oauth", oauth);
-		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		//saveSetting("oauth", oauth);
+		lightning.setupLightning(createComponent, JSON.parse(localStorage.get("forceOAuth")));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
@@ -98,7 +276,7 @@ var forceLogin = function forceLogin(key) {
 exports.forceLogin = forceLogin;
 clearLoginLink.addEventListener("click", clearLogin);
 
-},{"./force":3,"./lightning-config":4}],2:[function(require,module,exports){
+},{"./force":4,"./lightning-config":5}],3:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
@@ -126,7 +304,7 @@ function clearLogin() {
 
 function addActivity() {};
 
-},{"./App":1}],3:[function(require,module,exports){
+},{"./App":2}],4:[function(require,module,exports){
 /**
  * ForceJS - REST toolkit for Salesforce.com
  * Author: Christophe Coenraets @ccoenraets
@@ -144,7 +322,7 @@ loginURL = 'https://login.salesforce.com',
 // The Connected App client Id. Default app id provided - Not for production use.
 // This application supports http://localhost:8200/oauthcallback.html as a valid callback URL
 // To override default, pass appId in init(props)
-appId = '3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2',
+appId = '3MVG9fMtCkV6eLheIEZplMqWfnGlf3Y.BcWdOf1qytXo9zxgbsrUbS.ExHTgUPJeb3jZeT8NYhc.hMyznKU92',
 
 // The force.com API version to use.
 // To override default, pass apiVersion in init(props)
@@ -153,8 +331,11 @@ apiVersion = 'v35.0',
 // Keep track of OAuth data (access_token, refresh_token, and instance_url)
 oauth = undefined,
 
-// By default we store fbtoken in sessionStorage. This can be overridden in init()
+// By default we store token in memory. This can be overridden in init()
 tokenStore = {},
+
+// Keep track of the storage option
+useSessionStore = false;
 
 // if page URL is http://localhost:3000/myapp/index.html, context is /myapp
 context = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")),
@@ -171,10 +352,10 @@ proxyURL = baseURL,
 
 // if page URL is http://localhost:3000/myapp/index.html, oauthCallbackURL is http://localhost:3000/myapp/oauthcallback.html
 // To override default, pass oauthCallbackURL in init(props)
-oauthCallbackURL = baseURL + '/oauthcallback',
+oauthCallbackURL = baseURL + '/oauthcallback.html',
 
 // Reference to the Salesforce OAuth plugin
-oauthPlugin = undefined,
+oauthPlugin,
 
 // Whether or not to use a CORS proxy. Defaults to false if app running in Cordova, in a VF page,
 // or using the Salesforce console. Can be overriden in init()
@@ -230,7 +411,7 @@ var refreshTokenWithPlugin = function refreshTokenWithPlugin() {
     return new Promise(function (resolve, reject) {
         oauthPlugin.authenticate(function (response) {
             oauth.access_token = response.accessToken;
-            tokenStore.forceOAuth = JSON.stringify(oauth);
+            storeToken(JSON.stringify(oauth));
             resolve();
         }, function () {
             console.error('Error refreshing oauth access token using the oauth plugin');
@@ -264,7 +445,7 @@ var refreshTokenWithHTTPRequest = function refreshTokenWithHTTPRequest() {
                     console.log('Token refreshed');
                     var res = JSON.parse(xhr.responseText);
                     oauth.access_token = res.access_token;
-                    tokenStore.forceOAuth = JSON.stringify(oauth);
+                    storeToken(JSON.stringify(oauth));
                     resolve();
                 } else {
                     console.log('Error while trying to refresh token: ' + xhr.responseText);
@@ -295,6 +476,22 @@ var joinPaths = function joinPaths(path1, path2) {
     return path1 + path2;
 };
 
+var storeToken = function storeToken(oauth) {
+    if (useSessionStore) {
+        localStorage.set("forceOAuth", oauth);
+    } else {
+        tokenStore.forceOAuth = oauth;
+    }
+};
+
+/*let retrieveToken = () => {
+    if (useSessionStore) {
+        return localStorage.get("forceOAuth");
+    } else {
+        return JSON.parse(tokenStore.forceOAuth);
+    }
+}*/
+
 /**
  * Initialize ForceJS
  * @param params
@@ -308,36 +505,34 @@ var joinPaths = function joinPaths(path1, path2) {
  *  refreshToken (optional)
  */
 var init = function init(params) {
-    return new Promise(function (resolve, reject) {
 
-        if (params) {
-            appId = params.appId || appId;
-            apiVersion = params.apiVersion || apiVersion;
-            loginURL = params.loginURL || loginURL;
-            oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
-            proxyURL = params.proxyURL || proxyURL;
-            useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
-            tokenStore = params.tokenStore || tokenStore;
+    if (params) {
+        appId = params.appId || appId;
+        apiVersion = params.apiVersion || apiVersion;
+        loginURL = params.loginURL || loginURL;
+        oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
+        proxyURL = params.proxyURL || proxyURL;
+        useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
+        useSessionStore = params.useSessionStore || useSessionStore;
 
-            if (params.accessToken) {
-                if (!oauth) oauth = {};
-                oauth.access_token = params.accessToken;
-            }
-
-            if (params.instanceURL) {
-                if (!oauth) oauth = {};
-                oauth.instance_url = params.instanceURL;
-            }
-
-            if (params.refreshToken) {
-                if (!oauth) oauth = {};
-                oauth.refresh_token = params.refreshToken;
-            }
+        if (params.accessToken) {
+            if (!oauth) oauth = {};
+            oauth.access_token = params.accessToken;
         }
 
-        console.log("useProxy: " + useProxy);
-        resolve();
-    });
+        if (params.instanceURL) {
+            if (!oauth) oauth = {};
+            oauth.instance_url = params.instanceURL;
+        }
+
+        if (params.refreshToken) {
+            if (!oauth) oauth = {};
+            oauth.refresh_token = params.refreshToken;
+        }
+    }
+
+    console.log("useProxy: " + useProxy);
+    resolve();
 };
 
 exports.init = init;
@@ -346,7 +541,7 @@ exports.init = init;
  */
 var discardToken = function discardToken() {
     delete oauth.access_token;
-    tokenStore.forceOAuth = JSON.stringify(oauth);
+    storeToken(JSON.stringify(oauth));
 };
 
 exports.discardToken = discardToken;
@@ -408,7 +603,7 @@ var loginWithBrowser = function loginWithBrowser() {
                 queryString = url.substr(url.indexOf('#') + 1);
                 obj = parseQueryString(queryString);
                 oauth = obj;
-                tokenStore.forceOAuth = JSON.stringify(oauth);
+                storeToken(JSON.stringify(oauth));
                 resolve();
             } else if (url.indexOf("error=") > 0) {
                 queryString = decodeURIComponent(url.substring(url.indexOf('?') + 1));
@@ -670,7 +865,7 @@ var chatter = function chatter(pathOrParams) {
 };
 exports.chatter = chatter;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -679,7 +874,7 @@ Object.defineProperty(exports, "__esModule", {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 
-var _lightningOutEs6 = require('./lightning-out-es6');
+var _lightningOutEs6 = require('lightning-out-es6');
 
 var lightningOut = _interopRequireWildcard(_lightningOutEs6);
 
@@ -725,177 +920,4 @@ var setupLightning = function setupLightning(callback, oauth) {
 };
 exports.setupLightning = setupLightning;
 
-},{"./lightning-out-es6":5}],5:[function(require,module,exports){
-/* global $Lightning */
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-var _applicationTag;
-
-var _pendingReadyRequests = [],
-    _ready = false;
-
-var use = function use(applicationTag, callback, lightningEndPointURI, authToken) {
-	if (_applicationTag && _applicationTag !== applicationTag) {
-		throw new Error("Lightning.use() already invoked with application: " + _applicationTag);
-	}
-
-	if (!_applicationTag) {
-		_applicationTag = applicationTag;
-		_pendingReadyRequests = [];
-		_ready = false;
-
-		var parts = applicationTag.split(":");
-		var url = (lightningEndPointURI || "") + "/" + parts[0] + "/" + parts[1] + ".app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT";
-
-		var xhr = new XMLHttpRequest();
-
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState == 4 && xhr.status == 200) {
-				var config = JSON.parse(xhr.responseText);
-				var auraInitConfig = config.auraInitConfig;
-
-				addScripts(config.scripts, function () {
-					$A.initConfig(auraInitConfig, true);
-					lightningLoaded();
-				});
-
-				var styles = config.styles;
-				for (var n = 0; n < styles.length; n++) {
-					addStyle(styles[n]);
-				}
-			}
-		};
-
-		xhr.open("GET", url, true);
-
-		if (authToken) {
-			xhr.withCredentials = true;
-			xhr.setRequestHeader("Authorization", authToken);
-		}
-
-		xhr.send();
-	}
-
-	ready(function () {
-		// Request labels
-		$A.enqueueAction($A.get("c.aura://ComponentController.loadLabels"));
-	});
-
-	if (callback) {
-		ready(callback);
-	}
-};
-
-exports.use = use;
-var ready = function ready(callback) {
-	if (_ready) {
-		$A.run(callback);
-	} else {
-		_pendingReadyRequests.push(callback);
-	}
-};
-
-var createComponent = function createComponent(type, attributes, locator, callback) {
-	// Check to see if we know about the component - enforce aura:dependency
-	// is used to avoid silent performance killer
-	var unknownComponent;
-	try {
-		unknownComponent = $A.componentService.getDef(type) === undefined;
-	} catch (e) {
-		if ("Unknown component: markup://" + type === e.message) {
-			unknownComponent = true;
-		} else {
-			throw e;
-		}
-	}
-
-	if (unknownComponent) {
-		throw new Error("No component definiton for " + type + " in the client registry - add <aura:dependency resource=\"" + type + "\"/> to " + _applicationTag + ".");
-	} else {
-		$A.run(function () {
-			var config = {
-				componentDef: "markup://" + type,
-				attributes: {
-					values: attributes
-				}
-			};
-
-			$A.createComponent(type, attributes, function (component, status, statusMessage) {
-				var error = null;
-
-				var stringLocator = $A.util.isString(locator);
-				var hostEl = stringLocator ? document.getElementById(locator) : locator;
-
-				if (!hostEl) {
-					error = "Invalid locator specified - " + (stringLocator ? "no element found in the DOM with id=" + locator : "locator element not provided");
-				} else if (status !== "SUCCESS") {
-					error = statusMessage;
-				}
-
-				if (error) {
-					throw new Error(error);
-				}
-
-				$A.render(component, hostEl);
-				$A.afterRender(component);
-
-				if (callback) {
-					callback(component);
-				}
-			});
-		});
-	}
-};
-
-exports.createComponent = createComponent;
-var addScripts = function addScripts(urls, onload) {
-	var url = urls[0];
-	urls = urls.slice(1);
-
-	var script = document.createElement("SCRIPT");
-	script.type = "text/javascript";
-	script.src = url;
-
-	if (urls.length > 0) {
-		script.onload = function () {
-			addScripts(urls, onload);
-		};
-	} else {
-		script.onload = onload;
-	}
-
-	var head = document.getElementsByTagName("HEAD")[0];
-	head.appendChild(script);
-};
-
-var addStyle = function addStyle(url) {
-	var link = document.createElement("LINK");
-	link.href = url;
-	link.type = "text/css";
-	link.rel = "stylesheet";
-
-	var head = document.getElementsByTagName("HEAD")[0];
-	head.appendChild(link);
-};
-
-var lightningLoaded = function lightningLoaded() {
-	_ready = true;
-
-	// DCHASMAN TODO Add auraErrorMessage UI - figure out a better way to
-	// handle this!
-	if (!document.getElementById("auraErrorMessage")) {
-		var div = document.createElement("DIV");
-		div.id = "auraErrorMessage";
-		document.body.appendChild(div);
-	}
-
-	for (var n = 0; n < _pendingReadyRequests.length; n++) {
-		_pendingReadyRequests[n]();
-	}
-};
-exports.lightningLoaded = lightningLoaded;
-
-},{}]},{},[5,4,1,3,2]);
+},{"lightning-out-es6":1}]},{},[5,2,4,3]);

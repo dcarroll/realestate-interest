@@ -12,7 +12,7 @@ let // The login URL for the OAuth process
     // The Connected App client Id. Default app id provided - Not for production use.
     // This application supports http://localhost:8200/oauthcallback.html as a valid callback URL
     // To override default, pass appId in init(props)
-    appId = '3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2',
+    appId = '3MVG9fMtCkV6eLheIEZplMqWfnGlf3Y.BcWdOf1qytXo9zxgbsrUbS.ExHTgUPJeb3jZeT8NYhc.hMyznKU92',
 
     // The force.com API version to use.
     // To override default, pass apiVersion in init(props)
@@ -21,8 +21,11 @@ let // The login URL for the OAuth process
     // Keep track of OAuth data (access_token, refresh_token, and instance_url)
     oauth,
 
-    // By default we store fbtoken in sessionStorage. This can be overridden in init()
+    // By default we store token in memory. This can be overridden in init()
     tokenStore = {},
+
+    // Keep track of the storage option
+    useSessionStore = false;
 
     // if page URL is http://localhost:3000/myapp/index.html, context is /myapp
     context = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")),
@@ -39,7 +42,7 @@ let // The login URL for the OAuth process
 
     // if page URL is http://localhost:3000/myapp/index.html, oauthCallbackURL is http://localhost:3000/myapp/oauthcallback.html
     // To override default, pass oauthCallbackURL in init(props)
-    oauthCallbackURL = baseURL + '/oauthcallback',
+    oauthCallbackURL = baseURL + '/oauthcallback.html',
 
     // Reference to the Salesforce OAuth plugin
     oauthPlugin,
@@ -99,7 +102,7 @@ let refreshTokenWithPlugin = () => {
         oauthPlugin.authenticate(
             function (response) {
                 oauth.access_token = response.accessToken;
-                tokenStore.forceOAuth = JSON.stringify(oauth);
+                storeToken(JSON.stringify(oauth));
                 resolve();
             },
             function () {
@@ -137,7 +140,7 @@ let refreshTokenWithHTTPRequest = () => new Promise((resolve, reject) => {
                 console.log('Token refreshed');
                 let res = JSON.parse(xhr.responseText);
                 oauth.access_token = res.access_token;
-                tokenStore.forceOAuth = JSON.stringify(oauth);
+                storeToken(JSON.stringify(oauth));
                 resolve();
             } else {
                 console.log('Error while trying to refresh token: ' + xhr.responseText);
@@ -168,6 +171,22 @@ let joinPaths = (path1, path2) => {
     return path1 + path2;
 }
 
+let storeToken = (oauth) => {
+    if (useSessionStore) {
+        localStorage.set("forceOAuth", oauth);
+    } else {
+        tokenStore.forceOAuth = oauth;
+    }
+}
+
+/*let retrieveToken = () => {
+    if (useSessionStore) {
+        return localStorage.get("forceOAuth");
+    } else {
+        return JSON.parse(tokenStore.forceOAuth);
+    }
+}*/
+
 /**
  * Initialize ForceJS
  * @param params
@@ -180,7 +199,7 @@ let joinPaths = (path1, path2) => {
  *  instanceURL (optional)
  *  refreshToken (optional)
  */
-export let init = (params) => new Promise((resolve, reject) => {
+export let init = (params) => {
 
     if (params) {
         appId = params.appId || appId;
@@ -189,7 +208,7 @@ export let init = (params) => new Promise((resolve, reject) => {
         oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
         proxyURL = params.proxyURL || proxyURL;
         useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
-        tokenStore = params.tokenStore || tokenStore;
+        useSessionStore = params.useSessionStore || useSessionStore;
         
         if (params.accessToken) {
             if (!oauth) oauth = {};
@@ -209,14 +228,14 @@ export let init = (params) => new Promise((resolve, reject) => {
 
     console.log("useProxy: " + useProxy);
     resolve();
-});
+};
 
 /**
  * Discard the OAuth access_token. Use this function to test the refresh token workflow.
  */
 export let discardToken = () => {
     delete oauth.access_token;
-    tokenStore.forceOAuth = JSON.stringify(oauth);
+    storeToken(JSON.stringify(oauth));
 };
 
 /**
@@ -275,7 +294,7 @@ export let loginWithBrowser = () => new Promise((resolve, reject) => {
             queryString = url.substr(url.indexOf('#') + 1);
             obj = parseQueryString(queryString);
             oauth = obj;
-            tokenStore.forceOAuth = JSON.stringify(oauth);
+            storeToken(JSON.stringify(oauth));
             resolve();
         } else if (url.indexOf("error=") > 0) {
             queryString = decodeURIComponent(url.substring(url.indexOf('?') + 1));

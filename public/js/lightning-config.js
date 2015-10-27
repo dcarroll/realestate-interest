@@ -1,4 +1,4 @@
-﻿import * as lightningOut from './lightning-out-es6';
+﻿import * as lightningOut from 'lightning-out-es6';
 
 // Config vars area
 let config = { 

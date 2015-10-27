@@ -17,7 +17,7 @@ export let saveSetting = (name, value) => {
 };
 
 var clearLogin = () => {
-	_settings.remove("oauth");
+	_settings.remove("forceOAuth");
 	_settings.saveAsync();
 };
 
@@ -25,9 +25,9 @@ var clearLogin = () => {
 export let initialize = (settings) => {
 	console.log("app.initialize 2");
 	_settings = settings;
-	if (_settings.get("oauth") != undefined) {
-		oauth = _settings.get("oauth");
-		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+	if (_settings.get("forceOAuth") != undefined) {
+		localStorage.set("forceOAuth", _settings.get("forceOAuth"));
+		lightning.setupLightning(createComponent, JSON.parse(_settings.get("forceOAuth")));
 	} else {
 		forceLogin();
 	}
@@ -63,12 +63,12 @@ export let forceLogin = key => {
 	forcejs.init({ 
 			appId:"3MVG9SemV5D80oBfwImbjmCUOooxcQA5IOWhAPpgu5tZTe09L944U1N9rqfHev_RHMAu5BMPvkG7_nKbpV8M2",
 			oauthCallbackURL:"https://realestate-interest-test.herokuapp.com/AppRead/oauthcallback",
-			tokenStore:oauth
+			useSessionStore:true
 		}
 	).then(() => forcejs.login())
 	.then(() => {
-		saveSetting("oauth", oauth);
-		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		//saveSetting("oauth", oauth);
+		lightning.setupLightning(createComponent, JSON.parse(localStorage.get("forceOAuth")));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
