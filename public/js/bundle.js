@@ -15,11 +15,7 @@ var forcejs = _interopRequireWildcard(_force);
 
 var _lightningConfig = require('./lightning-config');
 
-var lightningConfig = _interopRequireWildcard(_lightningConfig);
-
-var _lightningOutEs6 = require('./lightning-out-es6');
-
-var lightning = _interopRequireWildcard(_lightningOutEs6);
+var lightning = _interopRequireWildcard(_lightningConfig);
 
 'use strict';
 
@@ -89,7 +85,7 @@ var forceLogin = function forceLogin(key) {
 		return forcejs.login();
 	}).then(function () {
 		saveSetting("oauth", oauth);
-		lightningConfig.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
+		lightning.setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {
@@ -102,7 +98,7 @@ var forceLogin = function forceLogin(key) {
 exports.forceLogin = forceLogin;
 clearLoginLink.addEventListener("click", clearLogin);
 
-},{"./force":3,"./lightning-config":4,"./lightning-out-es6":5}],2:[function(require,module,exports){
+},{"./force":3,"./lightning-config":4}],2:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
@@ -696,6 +692,11 @@ var config = {
 
 var _lightningReady = false;
 
+var createComponent = function createComponent(type, attributes, locator, callback) {
+	lightningOut.createComponent(type, attributes, locator, callback);
+};
+
+exports.createComponent = createComponent;
 var setupLightning = function setupLightning(callback, oauth) {
 	var appName = config.loApp;
 	if (!oauth) {

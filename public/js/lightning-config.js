@@ -9,6 +9,10 @@ let config = {
 
 let _lightningReady = false;
 
+export let createComponent = (type, attributes, locator, callback) => {
+	lightningOut.createComponent(type, attributes, locator, callback);
+};
+
 export let setupLightning = (callback, oauth) => {
 	var appName = config.loApp;
     if (!oauth) {
