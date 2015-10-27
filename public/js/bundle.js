@@ -74,7 +74,7 @@ var forceLogin = function forceLogin(key) {
 	});
 	forcejs.login().then(function () {
 		saveSetting("oauth", oauth);
-		setupLightning(createComponent);
+		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {

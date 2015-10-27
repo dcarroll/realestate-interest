@@ -60,7 +60,7 @@ export let forceLogin = key => {
 	);
 	forcejs.login().then(() => {
 		saveSetting("oauth", oauth);
-		setupLightning(createComponent);
+		setupLightning(createComponent, JSON.parse(oauth.forceOAuth));
 	});
 	//forceInit({instanceUrl:"https://d10-dev-ed.salesforce.com" });
 	//force.login(function(success) {

@@ -8,9 +8,8 @@ var config = {
 
 var _lightningReady = false;
 
-function setupLightning(callback) {
+function setupLightning(callback, oauth) {
 	var appName = config.loApp;
-	var oauth = force.getOauth();
     if (!oauth) {
         alert("Please login to Salesforce.com first!");
         return;
