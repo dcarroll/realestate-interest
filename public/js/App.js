@@ -6,6 +6,7 @@ import * as forcejs from 'forcejs';
 
 let app = {};
 let oauth = {};
+export let _settings = {};
 
 export let saveSetting = (name, value) => {
 	app._settings.set(name, value);

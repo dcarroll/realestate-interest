@@ -557,7 +557,9 @@ var forcejs = _interopRequireWildcard(_forcejs);
 
 var app = {};
 var oauth = {};
+var _settings = {};
 
+exports._settings = _settings;
 var saveSetting = function saveSetting(name, value) {
 	app._settings.set(name, value);
 	app._settings.saveAsync();
