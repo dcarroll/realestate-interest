@@ -555,9 +555,9 @@ Object.defineProperty(exports, "__esModule", {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 
-var _lightningOutEs6 = require('lightning-out-es6');
+var _lightningOut = require('lightning-out');
 
-var lightningOut = _interopRequireWildcard(_lightningOutEs6);
+var lightningOut = _interopRequireWildcard(_lightningOut);
 
 // Config vars area
 // vars are loApp - name of the lightning out app
@@ -796,7 +796,7 @@ var lightningLoaded = function lightningLoaded() {
 };
 exports.lightningLoaded = lightningLoaded;
 
-},{"lightning-out-es6":2}],3:[function(require,module,exports){
+},{"lightning-out":2}],3:[function(require,module,exports){
 /* global Office */
 // Common app functionality
 'use strict';
@@ -811,9 +811,9 @@ var _forcejs = require('forcejs');
 
 var forcejs = _interopRequireWildcard(_forcejs);
 
-var _lightningOutEs6 = require('lightning-out-es6');
+var _lightningOut = require('lightning-out');
 
-var lightning = _interopRequireWildcard(_lightningOutEs6);
+var lightning = _interopRequireWildcard(_lightningOut);
 
 'use strict';
 
@@ -889,7 +889,7 @@ var forceLogin = function forceLogin(key) {
 exports.forceLogin = forceLogin;
 clearLoginLink.addEventListener("click", clearLogin);
 
-},{"forcejs":1,"lightning-out-es6":2}],4:[function(require,module,exports){
+},{"forcejs":1,"lightning-out":2}],4:[function(require,module,exports){
 /* global $ */
 /// <reference path="App.js" />
 // global app
