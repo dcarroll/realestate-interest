@@ -22,7 +22,7 @@ function setupLightning(callback, oauth) {
 	} else {
 	    // Transform the URL for Lightning
 		var anchor = document.createElement('a');
-		anchor.href = oauth.instanceUrl;
+		anchor.href = oauth.instance_url;
 		var mydomain = anchor.hostname.split(".")[0];
 	    var url = anchor.protocol + "//" + mydomain +  ".lightning.force.com"; 
 	    $Lightning.use(appName, 
