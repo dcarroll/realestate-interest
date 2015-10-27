@@ -335,7 +335,7 @@ oauth = undefined,
 tokenStore = {},
 
 // Keep track of the storage option
-useSessionStore = false;
+useSessionStore = false,
 
 // if page URL is http://localhost:3000/myapp/index.html, context is /myapp
 context = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")),
@@ -355,7 +355,7 @@ proxyURL = baseURL,
 oauthCallbackURL = baseURL + '/oauthcallback.html',
 
 // Reference to the Salesforce OAuth plugin
-oauthPlugin,
+oauthPlugin = undefined,
 
 // Whether or not to use a CORS proxy. Defaults to false if app running in Cordova, in a VF page,
 // or using the Salesforce console. Can be overriden in init()

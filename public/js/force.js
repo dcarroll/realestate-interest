@@ -25,7 +25,7 @@ let // The login URL for the OAuth process
     tokenStore = {},
 
     // Keep track of the storage option
-    useSessionStore = false;
+    useSessionStore = false,
 
     // if page URL is http://localhost:3000/myapp/index.html, context is /myapp
     context = window.location.pathname.substring(0, window.location.pathname.lastIndexOf("/")),
