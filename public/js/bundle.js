@@ -303,6 +303,7 @@ var init = function init(params) {
         oauthCallbackURL = params.oauthCallbackURL || oauthCallbackURL;
         proxyURL = params.proxyURL || proxyURL;
         useProxy = params.useProxy === undefined ? useProxy : params.useProxy;
+        tokenStore = params.tokenStore || tokenStore;
 
         if (params.accessToken) {
             if (!oauth) oauth = {};
