@@ -889,7 +889,7 @@ var createComponent = function createComponent(type, attributes, locator, callba
 exports.createComponent = createComponent;
 var setupLightning = function setupLightning(callback, oauth) {
 	if (lightningOutConfig) {
-		var appName = config.loApp;
+		var appName = lightningOutConfig.loApp;
 		if (!oauth) {
 			alert("Please login to Salesforce.com first!");
 			return;
@@ -907,7 +907,7 @@ var setupLightning = function setupLightning(callback, oauth) {
 			var url = anchor.protocol + "//" + mydomain + ".lightning.force.com";
 			lightningOut.use(appName, function () {
 				_lightningReady = true;
-				document.getElementById(config.targetElementId).style.display = "";
+				document.getElementById(lightningOutConfig.targetElementId).style.display = "";
 				if (typeof callback === "function") {
 					callback();
 				}

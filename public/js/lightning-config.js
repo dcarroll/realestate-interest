@@ -29,7 +29,7 @@ export let createComponent = (type, attributes, locator, callback) => {
 
 export let setupLightning = (callback, oauth) => {
 	if (lightningOutConfig) {
-		var appName = config.loApp;
+		var appName = lightningOutConfig.loApp;
 	    if (!oauth) {
 	        alert("Please login to Salesforce.com first!");
 	        return;
@@ -48,7 +48,7 @@ export let setupLightning = (callback, oauth) => {
 		    lightningOut.use(appName, 
 		        function() {
 					_lightningReady = true;
-					document.getElementById(config.targetElementId).style.display = "";
+					document.getElementById(lightningOutConfig.targetElementId).style.display = "";
 					if (typeof callback === "function") {
 						callback();
 					}
