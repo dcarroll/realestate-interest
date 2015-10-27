@@ -19,8 +19,9 @@ export let clearLogin = () => {
 };
 
 // Common initialization function (to be called from each page)
-export let initialize = () => {
+export let initialize = (settings) => {
 	console.log("app.initialize 2");
+	_settings = settings;
 	forceLogin();
 };
 

@@ -573,8 +573,9 @@ var clearLogin = function clearLogin() {
 
 exports.clearLogin = clearLogin;
 // Common initialization function (to be called from each page)
-var initialize = function initialize() {
+var initialize = function initialize(settings) {
 	console.log("app.initialize 2");
+	exports._settings = _settings = settings;
 	forceLogin();
 };
 
